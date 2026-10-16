@@ -36,9 +36,11 @@ export function tokens(n: number): string {
   return String(n)
 }
 
-export function clock(ms: number): string {
+/** 06:04, 오늘이 아니면 10/18 06:04 */
+export function clock(ms: number, now: number): string {
   const d = new Date(ms)
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  return d.toDateString() === new Date(now).toDateString() ? hm : `${d.getMonth() + 1}/${d.getDate()} ${hm}`
 }
 
 /** 새로 넘은 문턱: 창마다 가장 높은 것 하나. 이미 알린 것은 뺀다. */

@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-import { compactLeft, crossings, project, record, remaining, tokens } from '../hooks/logic'
+import { clock, compactLeft, crossings, project, record, remaining, tokens } from '../hooks/logic'
 
 const BAND = {
   plugin: 'usage-hud',
@@ -69,4 +69,10 @@ test('측정값이 오면 띠에 한도를 그리고 문턱 알림은 세션을 
   expect(drawn).toContain('82%')
   expect(drawn).toContain('주간')
   expect(drawn).toContain('다른 띠')
+})
+
+test('소진 예상 시각은 오늘이면 시:분, 아니면 날짜를 붙인다', () => {
+  const now = new Date(2026, 9, 16, 9, 0).getTime()
+  expect(clock(new Date(2026, 9, 16, 6, 4).getTime(), now)).toBe('06:04')
+  expect(clock(new Date(2026, 9, 18, 6, 4).getTime(), now)).toBe('10/18 06:04')
 })

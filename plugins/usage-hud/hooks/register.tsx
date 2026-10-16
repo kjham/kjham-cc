@@ -125,9 +125,9 @@ async function segments($: EngineInterface): Promise<Segment[]> {
       { text: `${LABEL[w.kind]} `, dim: true },
       { text: `${w.percentUsed}%`, color: level(w.percentUsed), bold: w.percentUsed >= 80 },
     ]
-    if (w.resetsAtMs !== null) parts.push({ text: ` ↻${remaining(w.resetsAtMs - now)}`, dim: true })
+    if (w.resetsAtMs !== null) parts.push({ text: ` ↻ ${remaining(w.resetsAtMs - now)}`, dim: true })
     const p = projections.find(x => x.kind === w.kind)
-    if (p?.isBeforeReset) parts.push({ text: ` 소진예상 ${clock(p.etaMs)}`, color: 'warning', bold: true })
+    if (p?.isBeforeReset) parts.push({ text: ` · 소진 예상 ${clock(p.etaMs, now)}`, color: 'warning', bold: true })
     out.push({ key: w.kind, parts })
   }
   if (limits && now - limits.at > 10 * 60 * 1000) {
