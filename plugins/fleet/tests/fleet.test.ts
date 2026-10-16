@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { counts, describeStep, elapsed, kindOf, mergeRows, newlyWaiting, parseAgents, parseCard, waitKey } from '../hooks/logic'
+import { counts, describeStep, worktreeName, elapsed, kindOf, mergeRows, newlyWaiting, parseAgents, parseCard, waitKey } from '../hooks/logic'
 import type { Rec } from '../types'
 
 const base = (over: Partial<Rec>): Rec => ({
@@ -69,4 +69,10 @@ test('claude agents --json 을 읽고 형식이 다르면 빈 목록', () => {
   ])
   expect(parseAgents('oops')).toEqual([])
   expect(elapsed(75 * 60_000)).toBe('1h15')
+})
+
+test('워크트리에서 연 세션만 그 폴더 이름을 쓰고, 경로 표기 차이는 무시한다', () => {
+  expect(worktreeName('C:\\workspace\\repo', 'C:/workspace/repo.worktrees/repo-feat')).toBe('repo-feat')
+  expect(worktreeName('C:\\workspace\\Repo', 'c:/workspace/repo/')).toBe(undefined)
+  expect(worktreeName(null, 'C:/x')).toBe(undefined)
 })

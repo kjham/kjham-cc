@@ -161,7 +161,7 @@ async function segments($: EngineInterface): Promise<Segment[]> {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
-    await $.command.register({ name: 'hud', description: '사용량·한도·compact 상세를 패널로 연다' })
+    await $.command.register({ name: 'hud', description: '사용량·한도·compact 상세 패널을 열고 닫는다' })
     await adopt($)
     await ingest($, await $.session.usage())
     await measureContext($, true)
@@ -182,8 +182,12 @@ export const register: Register = on => {
   })
 
   on('command.run', { command: 'hud' }, async $ => {
-    await $.ui.open({ id: PANE, title: '사용량' })
-    return { text: '사용량 패널을 열었습니다.' }
+    if ((await $.ui.panes()).some(p => p.id === PANE)) {
+      await $.ui.close({ id: PANE })
+      return { text: '사용량 패널을 닫았습니다.' }
+    }
+    await $.ui.open({ id: PANE, title: '사용량', focus: true, closeOnEscape: true })
+    return { text: '사용량 패널을 열었습니다. Esc 또는 /hud 로 닫습니다.' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {

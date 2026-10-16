@@ -15,6 +15,8 @@ export type Rec = {
   sessionId: string
   cwd: string
   repo: string | null
+  /** 워크트리에서 연 세션이면 그 폴더 이름 */
+  worktree?: string
   branch: string | null
   surface: string
   state: RunState

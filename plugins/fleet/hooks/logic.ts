@@ -10,6 +10,13 @@ export function basename(path: string): string {
   return parts[parts.length - 1] ?? path
 }
 
+/** 워크트리면 그 폴더 이름, 원래 레포에서 연 세션이면 undefined. */
+export function worktreeName(repoRoot: string | null, top: string | null): string | undefined {
+  if (!repoRoot || !top) return undefined
+  const norm = (p: string) => p.replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase()
+  return norm(repoRoot) === norm(top) ? undefined : basename(top)
+}
+
 export function oneLine(text: string, max: number): string {
   const flat = text.replace(/\s+/g, ' ').trim()
   return flat.length > max ? flat.slice(0, max - 1) + '…' : flat

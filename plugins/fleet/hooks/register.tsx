@@ -13,6 +13,7 @@ import {
   mergeRows,
   newlyWaiting,
   oneLine,
+  worktreeName,
   parseAgents,
   parseCard,
   waitKey,
@@ -57,6 +58,16 @@ function patch($: EngineInterface, change: Partial<Rec>, isUrgent = false) {
     void flush($).then(() => poll($))
   } else if (!S.pending) {
     S.pending = $.clock.after(WRITE_DELAY_MS, () => void flush($))
+  }
+}
+
+/** 작업 트리의 최상위 폴더. 워크트리면 원래 레포 루트와 다르다. */
+async function worktreeTop($: EngineInterface): Promise<string | null> {
+  try {
+    const r = await $.process.run(['git', 'rev-parse', '--show-toplevel'], { timeoutMs: 5000 })
+    return r.exitCode === 0 ? r.stdout.trim() || null : null
+  } catch {
+    return null
   }
 }
 
@@ -127,13 +138,14 @@ export const register: Register = on => {
       sessionId: S.me,
       cwd,
       repo: repo ? basename(repo.root) : null,
+      worktree: worktreeName(repo?.root ?? null, await worktreeTop($)),
       branch: await branchOf($),
       surface,
       state: 'idle',
       hasUnseen: false,
       updatedAt: now,
     }
-    await $.command.register({ name: 'sessions', description: '이 PC의 모든 Claude Code 세션 현황을 패널로 연다' })
+    await $.command.register({ name: 'sessions', description: '이 PC의 모든 Claude Code 세션 현황 패널을 열고 닫는다' })
     await flush($)
     await poll($)
     $.clock.every(POLL_MS, () => void poll($))
@@ -211,10 +223,15 @@ export const register: Register = on => {
     return result
   })
 
+  // 한 번 더 치면 닫는다. 열 때 키보드를 가져가 Esc 로도 닫힌다.
   on('command.run', { command: 'sessions' }, async $ => {
+    if ((await $.ui.panes()).some(p => p.id === PANE)) {
+      await $.ui.close({ id: PANE })
+      return { text: '세션 현황 패널을 닫았습니다.' }
+    }
     await poll($)
-    await $.ui.open({ id: PANE, title: '세션 현황' })
-    return { text: '세션 현황 패널을 열었습니다.' }
+    await $.ui.open({ id: PANE, title: '세션 현황', focus: true, closeOnEscape: true })
+    return { text: '세션 현황 패널을 열었습니다. Esc 또는 /sessions 로 닫습니다.' }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -265,7 +282,7 @@ export const register: Register = on => {
         {rows.map(row => {
           const k = kindOf(row)
           const r = row.rec
-          const where = [r?.repo, r?.branch].filter(Boolean).join(' · ') || (row.agent?.cwd ? basename(row.agent.cwd) : '')
+          const where = [r?.worktree ?? r?.repo, r?.branch].filter(Boolean).join(' · ') || (row.agent?.cwd ? basename(row.agent.cwd) : '')
           const doing =
             k === 'waiting'
               ? (r?.waitingFor ?? '입력 대기')
