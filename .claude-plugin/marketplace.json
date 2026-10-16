@@ -1,0 +1,21 @@
+{
+  "name": "kjham-cc",
+  "owner": { "name": "Koenjoo Ham", "url": "https://github.com/kjham" },
+  "metadata": { "description": "개인 Claude Code mods — 사용량 HUD, 전역 세션 모니터, 한국어 응답 가드" },
+  "plugins": [
+    { "name": "usage-hud", "source": "./plugins/usage-hud" },
+    { "name": "fleet", "source": "./plugins/fleet" },
+    { "name": "ko-guard", "source": "./plugins/ko-guard" },
+    { "name": "turn-divider", "source": "./plugins/turn-divider" },
+    {
+      "name": "agent-radar",
+      "description": "hamzafer/claude-code-mods 의 agent-radar. 검토한 커밋으로 고정.",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/hamzafer/claude-code-mods.git",
+        "path": "mods/agent-radar",
+        "sha": "a56081601ed47d53c99584fdb11fff75f3656804"
+      }
+    }
+  ]
+}

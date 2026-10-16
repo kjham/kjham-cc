@@ -1,0 +1,10 @@
+{
+  "name": "fleet",
+  "version": "0.1.0",
+  "description": "이 PC의 모든 Claude Code 세션을 모아 입력창 위에 대기·결정·작업·새 결과 수를 보여 주고, 다른 세션이 입력을 기다리면 알린다. /sessions 는 세션별 상세 패널.",
+  "author": {
+    "name": "Koenjoo Ham",
+    "url": "https://github.com/kjham"
+  },
+  "types": "./types/index.d.ts"
+}

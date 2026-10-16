@@ -1,0 +1,9 @@
+{
+  "name": "ko-guard",
+  "version": "0.1.0",
+  "description": "매 턴 한국어 응답을 상기시키고, 영어로 답하면 표시해 /ko 로 다시 받게 한다. /ko-stats 는 감지 통계.",
+  "author": {
+    "name": "Koenjoo Ham",
+    "url": "https://github.com/kjham"
+  }
+}

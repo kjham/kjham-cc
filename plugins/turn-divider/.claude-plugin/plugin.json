@@ -1,0 +1,9 @@
+{
+  "name": "turn-divider",
+  "version": "0.1.0",
+  "description": "대화 기록에서 내 질문 줄 위마다 구분선을 그어 질문별로 나눈다",
+  "author": {
+    "name": "Koenjoo Ham",
+    "url": "https://github.com/kjham"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "usage-hud",
+  "version": "0.1.0",
+  "description": "입력창 위에 5시간·주간 한도(초기화·소진 예상), compact까지 남은 토큰, 컨텍스트, 세션 비용, Claude 장애를 한 줄로 보여 준다. /hud 는 패널.",
+  "author": {
+    "name": "Koenjoo Ham",
+    "url": "https://github.com/kjham"
+  },
+  "types": "./types/index.d.ts"
+}

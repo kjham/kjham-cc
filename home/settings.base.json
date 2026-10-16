@@ -1,0 +1,14 @@
+{
+  "language": "korean",
+  "statusLine": { "type": "command", "command": "npx -y ccstatusline@2.2.30", "padding": 0 },
+  "extraKnownMarketplaces": {
+    "kjham-cc": { "source": { "source": "github", "repo": "kjham/kjham-cc" } }
+  },
+  "enabledPlugins": {
+    "usage-hud@kjham-cc": true,
+    "fleet@kjham-cc": true,
+    "ko-guard@kjham-cc": true,
+    "turn-divider@kjham-cc": true,
+    "agent-radar@kjham-cc": true
+  }
+}
