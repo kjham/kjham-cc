@@ -7,6 +7,7 @@
     { "name": "fleet", "source": "./plugins/fleet" },
     { "name": "ko-guard", "source": "./plugins/ko-guard" },
     { "name": "turn-divider", "source": "./plugins/turn-divider" },
+    { "name": "slide-craft", "source": "./plugins/slide-craft" },
     {
       "name": "agent-radar",
       "description": "hamzafer/claude-code-mods 의 agent-radar. 검토한 커밋으로 고정.",

@@ -5,7 +5,7 @@
 //   --settings-only  설정·파일만 반영하고 플러그인 설치는 건너뛴다.
 //   --dry-run        바꿀 내용만 출력한다.
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -68,6 +68,16 @@ write(join(claudeDir, 'hooks', 'autorun.mjs'), readFileSync(join(repo, 'home', '
 const ccsl = join(homedir(), '.config', 'ccstatusline', 'settings.json')
 if (existsSync(ccsl)) console.log(`  = ${ccsl} (이미 있어 그대로 둠 — 바꾸려면 npx ccstatusline@2.2.30 로 편집)`)
 else write(ccsl, readFileSync(join(repo, 'home', 'ccstatusline', 'settings.json'), 'utf8'))
+
+// Codex 도 같은 SKILL.md 형식을 읽는다. Codex 를 쓰는 PC 에서만 스킬을 ~/.codex/skills 로 복사한다.
+const codexDir = process.env.CODEX_HOME || join(homedir(), '.codex')
+if (existsSync(codexDir)) {
+  console.log('\n[2-1] Codex 스킬')
+  const skillsRoot = join(repo, 'plugins', 'slide-craft', 'skills')
+  for (const name of readdirSync(skillsRoot)) {
+    write(join(codexDir, 'skills', name, 'SKILL.md'), readFileSync(join(skillsRoot, name, 'SKILL.md'), 'utf8'))
+  }
+}
 
 if (isSettingsOnly) process.exit(0)
 
