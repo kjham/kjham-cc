@@ -1,6 +1,6 @@
 {
   "name": "slide-craft",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "발표 자료를 스토리라인부터 검수까지 단계로 만들고(slide-deck), 한국어 글과 화면에서 AI 티를 걷어 낸다(humanize-ko).",
   "author": {
     "name": "Koenjoo Ham",

@@ -74,8 +74,11 @@ const codexDir = process.env.CODEX_HOME || join(homedir(), '.codex')
 if (existsSync(codexDir)) {
   console.log('\n[2-1] Codex 스킬')
   const skillsRoot = join(repo, 'plugins', 'slide-craft', 'skills')
-  for (const name of readdirSync(skillsRoot)) {
-    write(join(codexDir, 'skills', name, 'SKILL.md'), readFileSync(join(skillsRoot, name, 'SKILL.md'), 'utf8'))
+  // SKILL.md 가 가리키는 딸린 파일(assets 등)도 같은 상대 경로로 복사한다.
+  for (const rel of readdirSync(skillsRoot, { recursive: true, withFileTypes: true })) {
+    if (!rel.isFile()) continue
+    const from = join(rel.parentPath ?? rel.path, rel.name)
+    write(join(codexDir, 'skills', from.slice(skillsRoot.length + 1)), readFileSync(from, 'utf8'))
   }
 }
 
