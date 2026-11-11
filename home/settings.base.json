@@ -4,6 +4,15 @@
   "extraKnownMarketplaces": {
     "kjham-cc": { "source": { "source": "github", "repo": "kjham/kjham-cc" } }
   },
+  "promptCacheTtl": "1h",
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "compact|resume", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
+    ]
+  },
   "enabledPlugins": {
     "usage-hud@kjham-cc": true,
     "fleet@kjham-cc": true,
