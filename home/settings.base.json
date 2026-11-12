@@ -4,8 +4,13 @@
   "extraKnownMarketplaces": {
     "kjham-cc": { "source": { "source": "github", "repo": "kjham/kjham-cc" } }
   },
+  "env": { "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet" },
+  "autoCompactWindow": 300000,
   "promptCacheTtl": "1h",
   "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
+    ],
     "SessionStart": [
       { "matcher": "compact|resume", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
     ],

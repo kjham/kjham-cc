@@ -3,6 +3,8 @@
 개인 Claude Code 환경 — mods 마켓플레이스와 전역 설정. Windows·macOS 공용, 모든 레포에 user 스코프로 적용된다.
 설계 배경 문서는 별도 보관.
 
+> **다른 PC에서 최신 내용을 받을 때는 `git pull` 뒤에 설치 스크립트를 다시 실행해야 한다.** 설정·전역 지침·hook 은 `~/.claude` 로 복사되는 파일이라 pull 만으로는 바뀌지 않는다. 아래 [업데이트](#업데이트) 참고.
+
 ## 구성
 
 | 이름 | 종류 | 하는 일 | 명령 |
@@ -14,9 +16,25 @@
 | `slide-craft` | 스킬 | `slide-deck`: 발표 자료를 스토리라인 → 다이어그램 → 제작 → 렌더링 검수 → 정제 → 사실 대조 순으로 만든다. `humanize-ko`: 한국어 글·장표에서 AI 티를 점검표로 걷어 낸다. Codex 가 있는 PC 에는 `~/.codex/skills` 로도 복사된다 | `/slide-craft:slide-deck`, `/slide-craft:humanize-ko` |
 | `agent-radar` | 서드파티 mod | 실행 중인 서브에이전트당 한 줄 (hamzafer/claude-code-mods, 커밋 고정) | `/radar` |
 | `home/CLAUDE.md` | 전역 지침 | 한국어 규칙, **결과 카드** 형식(`fleet` 이 읽어 세션 현황에 표시) | — |
-| `home/settings.base.json` | 설정 | `language: korean`, 상태줄, 마켓플레이스·플러그인 활성화, 무인 진행 hook 등록, cache TTL 1h | — |
-| `home/hooks/autorun.mjs` | command hook | 무인 진행. `~/.claude/autorun/<세션 이름>.md` 가 있는 세션만: compact·resume 직후 지시를 다시 넣고, 멈추려 하면 한 번 되돌린다. 파일에 `status: done` 을 쓰면 꺼진다. 10분 자기 알림 cron 대신 쓴다. mod API 는 멈춤을 막을 수 없어 command hook 으로 둔다 | — |
+| `home/settings.base.json` | 설정 | `language: korean`, 상태줄, 마켓플레이스·플러그인 활성화, 무인 진행 hook 등록, 토큰 절감 설정(아래) | — |
+| `home/hooks/autorun.mjs` | command hook | 무인 진행. "멈추지 말고", "승인 없이", "퇴근" 같은 지시를 받으면 원문을 `~/.claude/autorun/<세션 이름>.md` 에 저장한다(신호가 약하거나 예로 든 글이면 저장 여부를 모델이 판단, "무인 진행 꺼"로 끔). 이 파일이 있는 세션만: compact·resume 직후 지시를 다시 넣고, 멈추려 하면 한 번 되돌린다. 파일에 `status: done` 을 쓰면 꺼진다. 10분 자기 알림 cron 대신 쓴다. mod API 는 멈춤을 막을 수 없어 command hook 으로 둔다 | — |
+| `tools/usage/` | 측정 스크립트 | `~/.claude/projects` 기록으로 일·모델·세션·context 분포·tool 출력 크기(`analyze_usage.py`)와 턴을 시작한 주체별 비용(`turn_attribution.py`)을 낸다 | `python tools/usage/analyze_usage.py 2026-11-12 2026-11-13` |
 | `home/ccstatusline/` | 상태줄 | 모델·브랜치·변경·**캐시 타이머·적중률**·compaction 횟수 (캐시 값은 mod API 에 없어 상태줄이 맡는다) | — |
+
+## 토큰 절감 설정
+
+설치하면 아래가 함께 들어간다. 근거는 2026-11 사용량 분석이다. 그달 비용의 90%가 긴 context 재읽기와 cache 쓰기였다.
+
+| 설정 | 값 | 하는 일 |
+|---|---|---|
+| `autoCompactWindow` | `300000` | 1M context 모델도 300k에서 compact 한다. 기본값으로는 1M 가까이 가서야 compact 한다 |
+| `env.CLAUDE_CODE_SUBAGENT_MODEL` | `sonnet` | 모델을 지정하지 않은 subagent(general-purpose, Explore 등)를 Sonnet으로 돌린다. 레포 agent가 `model:`을 지정했으면 그 값을 따른다 |
+| `promptCacheTtl` | `1h` | 쉬었다 돌아와도 cache가 남는다. API key·Bedrock은 기본값이 5분이다 |
+| `home/hooks/autorun.mjs` | hook 3개 | 10분 자기 알림 cron 없이 무인 진행 |
+| `home/CLAUDE.md` | 결과 카드 규칙 | 작업이 바뀌면 `/clear` 후 새 세션으로 하라고 안내한다 |
+
+- 기기별 값(`model`, Bedrock `env`, 권한)은 넣지 않는다. 각 PC의 `settings.json`에 둔다.
+- 측정: `PYTHONUTF8=1 python tools/usage/analyze_usage.py <시작일> <끝일(미포함)>`. 인자를 생략하면 이번 달 1일부터 본다.
 
 ## 설치
 
@@ -33,6 +51,27 @@ cd kjham-cc
 - `--dev`: 마켓플레이스를 이 클론 폴더로 등록한다. 편집 후 `/reload-plugins` 만으로 반영된다(주 개발 PC 용).
 - `--settings-only`, `--dry-run` 지원.
 - 열려 있는 세션은 `/reload-plugins`, 새 세션은 바로 적용.
+
+## 업데이트
+
+다른 PC(맥북 등)에서 이 레포의 새 내용을 받을 때마다 아래 두 줄을 실행한다.
+
+```bash
+cd kjham-cc && git pull
+./bootstrap/install.sh            # macOS
+.\bootstrap\install.ps1           # Windows
+```
+
+| 바뀐 것 | pull 만으로 반영 | 설치 스크립트 필요 | 적용 시점 |
+|---|---|---|---|
+| mod·스킬(`plugins/`) | ✗ | ✓ 마켓플레이스 갱신·재설치 | 열린 세션은 `/reload-plugins` |
+| 설정(`home/settings.base.json`) | ✗ | ✓ `~/.claude/settings.json` 에 병합 | hook·`promptCacheTtl` 은 바로, `autoCompactWindow`·`env` 는 새 세션부터 |
+| 전역 지침(`home/CLAUDE.md`) | ✗ | ✓ `~/.claude/CLAUDE.md` 로 복사 | 새 세션 또는 `/clear` 뒤 |
+| hook 스크립트(`home/hooks/`) | ✗ | ✓ `~/.claude/hooks/` 로 복사 | 바로 |
+| 측정 스크립트(`tools/`) | ✓ | — | 바로 |
+
+- 같은 내용을 다시 설치해도 안전하다. 바뀐 파일만 백업 후 덮어쓰고 나머지는 `(변경 없음)` 으로 건너뛴다.
+- 반영됐는지 확인: `grep -E 'autoCompactWindow|UserPromptSubmit' ~/.claude/settings.json` 이 두 줄을 내면 최신이다.
 
 ## 개발
 
