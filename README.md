@@ -11,7 +11,7 @@
 |---|---|---|---|
 | `usage-hud` | mod | 입력창 위 한 줄: 5시간·주간 한도와 초기화까지 남은 시간, 소진 예상 시각, compact 까지 남은 토큰, 컨텍스트, 세션 비용, Claude 장애. 한도 값은 모든 세션이 공유해 쉬는 세션도 최신값을 보인다 | `/hud` 패널 |
 | `fleet` | mod | 이 PC의 모든 세션을 모아 대기·결정 필요·작업·새 결과 수를 보여 주고, 다른 세션이 권한 확인·질문으로 멈추면 알린다 | `/sessions` 패널 |
-| `ko-guard` | mod | 매 턴 한국어·결과 카드 상기, 영어 답변 감지 표시, 감지 통계 | `/ko`, `/ko-stats` |
+| `ko-guard` | mod | 매 턴 한국어·결과 카드 상기, 영어 답변 감지 toast, 감지 통계 | `/ko`, `/ko-stats` |
 | `turn-divider` | mod | 내 질문 위에 구분선 | — |
 | `slide-craft` | 스킬 | `slide-deck`: 발표 자료를 스토리라인 → 다이어그램 → 제작 → 렌더링 검수 → 정제 → 사실 대조 순으로 만든다. `humanize-ko`: 한국어 글·장표에서 AI 티를 점검표로 걷어 낸다. Codex 가 있는 PC 에는 `~/.codex/skills` 로도 복사된다 | `/slide-craft:slide-deck`, `/slide-craft:humanize-ko` |
 | `agent-radar` | 서드파티 mod | 실행 중인 서브에이전트당 한 줄 (hamzafer/claude-code-mods, 커밋 고정) | `/radar` |

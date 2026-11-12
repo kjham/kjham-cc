@@ -30,7 +30,9 @@ export const register: Register = on => {
     if (e.agentId || e.reason !== 'answer') return result
     const isEn = isEnglish(e.answer)
     await count($, isEn)
-    return isEn ? { ...result, text: `${result.text}\n\n⚠ 영어로 답했습니다 — /ko 로 한국어로 다시 받기` } : result
+    // 답변 text 를 바꾸면 Claude Code 가 mod 메시지로 다시 찍으며 줄바꿈이 깨지고 두 번 나온다. 본문은 두고 toast 로만 알린다.
+    if (isEn) await $.ui.toast('⚠ 영어로 답했습니다 — /ko 로 한국어로 다시 받기')
+    return result
   })
 
   on('command.run', { command: 'ko' }, async $ => {
