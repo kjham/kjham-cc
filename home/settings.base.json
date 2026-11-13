@@ -7,6 +7,17 @@
   "env": { "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet" },
   "autoCompactWindow": 300000,
   "promptCacheTtl": "1h",
+  "skillOverrides": {
+    "anthropic-skills:docx": "name-only",
+    "anthropic-skills:xlsx": "name-only",
+    "anthropic-skills:pptx": "name-only",
+    "anthropic-skills:pdf": "name-only",
+    "anthropic-skills:morning": "name-only",
+    "anthropic-skills:import-memory": "name-only",
+    "anthropic-skills:artifact-emulator": "name-only",
+    "anthropic-skills:google-workspace": "name-only",
+    "anthropic-skills:skill-creator": "name-only"
+  },
   "hooks": {
     "UserPromptSubmit": [
       { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
