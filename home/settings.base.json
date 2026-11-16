@@ -20,10 +20,15 @@
   },
   "hooks": {
     "UserPromptSubmit": [
-      { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
+      { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] },
+      { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/token-guard.mjs\"", "timeout": 10 }] }
     ],
     "SessionStart": [
-      { "matcher": "compact|resume", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }
+      { "matcher": "compact|resume", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] },
+      { "matcher": "startup", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/token-guard.mjs\"", "timeout": 10 }] }
+    ],
+    "PreToolUse": [
+      { "matcher": "CronCreate", "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/token-guard.mjs\"", "timeout": 10 }] }
     ],
     "Stop": [
       { "hooks": [{ "type": "command", "command": "node \"$HOME/.claude/hooks/autorun.mjs\"", "timeout": 10 }] }

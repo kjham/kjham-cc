@@ -1,6 +1,6 @@
 # kjham-cc
 
-개인 Claude Code 환경 — mods 마켓플레이스와 전역 설정. Windows·macOS 공용, 모든 레포에 user 스코프로 적용된다.
+Claude Code 설정 개인 GitHub 저장소 — mods 마켓플레이스, 전역 설정, 토큰 절감 설정과 hook. Windows·macOS 공용, 모든 레포에 user 스코프로 적용된다.
 설계 배경 문서는 별도 보관.
 
 > **다른 PC에서 최신 내용을 받을 때는 `git pull` 뒤에 설치 스크립트를 다시 실행해야 한다.** 설정·전역 지침·hook 은 `~/.claude` 로 복사되는 파일이라 pull 만으로는 바뀌지 않는다. 아래 [업데이트](#업데이트) 참고.
@@ -18,6 +18,7 @@
 | `home/CLAUDE.md` | 전역 지침 | 한국어 규칙, **결과 카드** 형식(`fleet` 이 읽어 세션 현황에 표시) | — |
 | `home/settings.base.json` | 설정 | `language: korean`, 상태줄, 마켓플레이스·플러그인 활성화, 무인 진행 hook 등록, 토큰 절감 설정(아래) | — |
 | `home/hooks/autorun.mjs` | command hook | 무인 진행. "멈추지 말고", "승인 없이", "퇴근" 같은 지시를 받으면 원문을 `~/.claude/autorun/<세션 이름>.md` 에 저장한다(신호가 약하거나 예로 든 글이면 저장 여부를 모델이 판단, "무인 진행 꺼"로 끔). 이 파일이 있는 세션만: compact·resume 직후 지시를 다시 넣고, 멈추려 하면 한 번 되돌린다. 파일에 `status: done` 을 쓰면 꺼진다. 10분 자기 알림 cron 대신 쓴다. mod API 는 멈춤을 막을 수 없어 command hook 으로 둔다 | — |
+| `home/hooks/token-guard.mjs` | command hook | 토큰 절감 알림 3가지. 60분 넘게 쉬었고 context 가 200k 를 넘으면 첫 입력을 한 번 막고 `/compact` 를 권한다(다시 보내면 통과). 30분보다 짧은 반복 cron 은 만들기 전에 확인을 받는다. 새 세션 시작 때 프로젝트 `MEMORY.md` 가 80줄을 넘으면 알린다 | — |
 | `home/agents/Explore.md` | subagent | 내장 `Explore` 를 같은 이름으로 덮어 Haiku 로 돌린다. 읽기 전용 탐색, 한국어 보고 | — |
 | `tools/usage/` | 측정 스크립트 | `~/.claude/projects` 기록으로 일·모델·세션·context 분포·tool 출력 크기(`analyze_usage.py`)와 턴을 시작한 주체별 비용(`turn_attribution.py`)을 낸다 | `python tools/usage/analyze_usage.py 2026-11-12 2026-11-13` |
 | `home/ccstatusline/` | 상태줄 | 모델·브랜치·변경·**캐시 타이머·적중률**·compaction 횟수 (캐시 값은 mod API 에 없어 상태줄이 맡는다) | — |
@@ -34,14 +35,15 @@
 | `skillOverrides` | 거의 안 쓰는 문서 skill 9개 `name-only` | 매 호출에 실리는 skill 설명문을 줄인다. 이름은 남아 모델이 여전히 부를 수 있다 |
 | `home/agents/Explore.md` | `model: haiku` | 넓은 코드 탐색 subagent를 Haiku로 돌린다. 새 세션부터 적용된다 |
 | `home/hooks/autorun.mjs` | hook 3개 | 10분 자기 알림 cron 없이 무인 진행 |
-| `home/CLAUDE.md` | 결과 카드·도구 사용 규칙 | 작업이 바뀌면 `/clear` 후 새 세션으로 하라고 안내한다. 짧은 명령은 foreground로, subagent는 필요한 만큼만, 넓은 탐색은 `Explore`로 |
+| `home/hooks/token-guard.mjs` | hook 3개 | 오래 쉰 큰 세션의 첫 입력 전 `/compact` 권유, 30분 미만 반복 cron 확인, `MEMORY.md` 80줄 초과 알림 |
+| `home/CLAUDE.md` | 결과 카드·도구 사용 규칙 | 작업이 바뀌면 `/clear` 후 새 세션으로 하라고 안내한다. 짧은 명령은 foreground로, subagent는 필요한 만큼만, 넓은 탐색은 `Explore`로, 답변은 결론부터 짧게 |
 
 - 기기별 값(`model`, Bedrock `env`, 권한)은 넣지 않는다. 각 PC의 `settings.json`에 둔다.
 - 측정: `PYTHONUTF8=1 python tools/usage/analyze_usage.py <시작일> <끝일(미포함)>`. 인자를 생략하면 이번 달 1일부터 본다.
 
 ## 설치
 
-Claude Code 2.1.287+, Node 18+ (설치 스크립트·상태줄용), git 자격증명(GitHub private 접근).
+Claude Code 2.1.287+, Node 18+ (설치 스크립트·상태줄·hook 용), git.
 
 ```bash
 git clone https://github.com/kjham/kjham-cc.git
