@@ -1,0 +1,5 @@
+# 선택 적용: codex -p kjham-cc
+# 기본 config.toml의 notify, hooks, 모델, 권한 및 MCP 설정을 바꾸지 않는다.
+[tui]
+status_line = ["model-with-reasoning", "context-remaining", "git-branch", "current-dir"]
+terminal_title = ["project", "status", "thread", "task-progress"]

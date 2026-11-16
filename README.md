@@ -1,6 +1,6 @@
 # kjham-cc
 
-Claude Code 설정 개인 GitHub 저장소 — mods 마켓플레이스, 전역 설정, 토큰 절감 설정과 hook. Windows·macOS 공용, 모든 레포에 user 스코프로 적용된다.
+Claude Code·Codex 개인 설정 저장소. Claude Code mods와 hook, Codex 지침·스킬·선택형 CLI 프로필을 Windows·macOS에 배포한다. 제품별 설정과 기록은 분리한다.
 설계 배경 문서는 별도 보관.
 
 > **다른 PC에서 최신 내용을 받을 때는 `git pull` 뒤에 설치 스크립트를 다시 실행해야 한다.** 설정·전역 지침·hook 은 `~/.claude` 로 복사되는 파일이라 pull 만으로는 바뀌지 않는다. 아래 [업데이트](#업데이트) 참고.
@@ -10,7 +10,10 @@ Claude Code 설정 개인 GitHub 저장소 — mods 마켓플레이스, 전역 �
 | 이름 | 종류 | 하는 일 | 명령 |
 |---|---|---|---|
 | `usage-hud` | mod | 입력창 위 한 줄: 5시간·주간 한도와 초기화까지 남은 시간, 소진 예상 시각, compact 까지 남은 토큰, 컨텍스트, 세션 비용, Claude 장애. 한도 값은 모든 세션이 공유해 쉬는 세션도 최신값을 보인다 | `/hud` 패널 |
-| `fleet` | mod | 이 PC의 모든 세션을 모아 대기·결정 필요·작업·새 결과 수를 보여 주고, 다른 세션이 권한 확인·질문으로 멈추면 알린다 | `/sessions` 패널 |
+| `fleet` | mod | 세션 현황·진행도를 보고, 결과 카드의 남은 일과 결정 필요를 세션 종료 후에도 보관한다 | `/sessions` 패널 |
+| `session-nickname` | mod | 이름 없는 대화형 세션에 별명을 붙이고 입력창 힌트에 표시한다. 기존 이름·resume 세션은 보존한다 | `/rename`으로 변경 |
+| `long-turn-notify` | mod | 2분 이상 작업의 완료·오류, 질문·권한 대기를 Windows·macOS 알림으로 표시한다. 기본 무음 | — |
+| `compact-tool-rows` | mod | 정상 접힌 Bash 행은 화면 폭에 맞춰 줄이고 펼침·실패·중단 행에서는 원문을 보여 준다 | — |
 | `ko-guard` | mod | 매 턴 한국어·결과 카드 상기, 영어 답변 감지 toast, 감지 통계 | `/ko`, `/ko-stats` |
 | `turn-divider` | mod | 내 질문 위에 구분선 | — |
 | `slide-craft` | 스킬 | `slide-deck`: 발표 자료를 스토리라인 → 다이어그램 → 제작 → 렌더링 검수 → 정제 → 사실 대조 순으로 만든다. `humanize-ko`: 한국어 글·장표에서 AI 티를 점검표로 걷어 낸다. Codex 가 있는 PC 에는 `~/.codex/skills` 로도 복사된다 | `/slide-craft:slide-deck`, `/slide-craft:humanize-ko` |
@@ -22,6 +25,55 @@ Claude Code 설정 개인 GitHub 저장소 — mods 마켓플레이스, 전역 �
 | `home/agents/Explore.md` | subagent | 내장 `Explore` 를 같은 이름으로 덮어 Haiku 로 돌린다. 읽기 전용 탐색, 한국어 보고 | — |
 | `tools/usage/` | 측정 스크립트 | `~/.claude/projects` 기록으로 일·모델·세션·context 분포·tool 출력 크기(`analyze_usage.py`)와 턴을 시작한 주체별 비용(`turn_attribution.py`)을 낸다 | `python tools/usage/analyze_usage.py 2026-11-12 2026-11-13` |
 | `home/ccstatusline/` | 상태줄 | 모델·브랜치·변경·**캐시 타이머·적중률**·compaction 횟수 (캐시 값은 mod API 에 없어 상태줄이 맡는다) | — |
+
+## 세션 현황과 남은 일
+
+입력창 위에는 대기·작업·새 결과·미해결 항목 수를 짧게 표시한다. `/sessions` 패널은 현재 세션과 보관된 남은 일을 나눈다. 작업 단계 수가 있으면 진행 표시를 붙이며, 기존 테마의 의미별 색상을 따른다.
+
+결과 카드의 `남은 일` 또는 `결정 필요`가 있는 메인 답변을 보관한다. 새 답변이나 세션 종료가 예전 항목을 자동으로 완료시키지 않는다. 패널의 ID를 복사해 정리한다. 유일하게 식별되는 ID 앞부분도 사용할 수 있다.
+
+```text
+/sessions done <ID>       완료
+/sessions defer <ID>      보류
+/sessions reopen <ID>     다시 열기
+/sessions history         완료 기록과 ID 조회
+```
+
+`완료`, `보류`, `재개`도 명령 인자로 쓸 수 있다. 완료 항목은 패널에 24시간 표시하며 이후에도 `history`에서 찾을 수 있다. 기록은 `fleet`의 로컬 plugin store에 남고, 다른 PC와 동기화되지 않는다. 기존 결과 카드 형식을 활용하므로 진행 기록용 모델 호출을 추가하지 않는다.
+
+알림은 사용자가 중단한 턴과 2분 미만 작업에는 완료 알림을 보내지 않는다. 실행·대기 중인 subagent가 있으면 완료 알림을 미룬다. 질문·권한 대기는 작업 시간과 관계없이 알린다. Windows는 PowerShell의 OS toast, macOS는 `osascript`를 사용하며 실제 표시 여부는 OS 알림 설정에 따른다. 지원하지 않는 OS에서는 알리지 않는다.
+
+세션 별명과 권한 대기 감지는 Claude Code의 `sessions/*.json` 기록을 읽는다. `CLAUDE_CONFIG_DIR`, `USERPROFILE`, `HOME`을 지원한다. 엔진의 기록 형식이 바뀌면 확인이 필요하다. 기존 `wj-mods`의 같은 기능을 함께 활성화하면 이름 변경·알림·화면 처리가 겹칠 수 있다.
+
+`session-nickname`, `long-turn-notify`, `compact-tool-rows`는 [wonjangcloud9/wj-mods](https://github.com/wonjangcloud9/wj-mods/tree/5244bd0f768474cc05e694e3ed6bbcb71ea2ac7c)를 참고·수정했다. 각 plugin에 원본 MIT 고지를 보존한다. `fleet`의 구역 구분과 단순한 상태 기호도 이 저장소의 화면 구성을 참고했다. `usage-hud`, `ko-guard`, `turn-divider`는 기존 구현을 유지하며, 추가 모델 호출이 필요한 `plain-summary`는 포함하지 않는다.
+
+## Codex 적용 범위
+
+| 기능 | Claude Code | Codex |
+|---|---|---|
+| 개인 지침 | `home/CLAUDE.md` | `codex/AGENTS.md`를 기존 전역 AGENTS의 관리 블록에 병합 |
+| 사용량·상태 표시 | `usage-hud`, `fleet` mod | CLI의 `/statusline`, `/usage`, `/title`; 선택형 `kjham-cc` 프로필 |
+| 여러 대화 확인 | `/sessions` | 앱 Activity 또는 CLI `codex agents` |
+| 완료·입력 대기 알림 | `long-turn-notify` | 앱 기본 알림과 기존 사용자 설정 유지 |
+| 개인 남은 일 | 결과 카드에서 자동 수집 | 사용자가 요청할 때 `kjham-followups` 스킬로 보관·조회·완료·보류·재개 |
+| 발표 자료·한국어 다듬기 | `slide-craft` plugin | 같은 스킬 원본을 Codex skills에 복사 |
+
+Codex만 설치하려면 다음을 실행한다.
+
+```bash
+node bootstrap/install.mjs --target=codex
+codex -p kjham-cc
+```
+
+첫 명령은 지침과 스킬을 설치하고 `$CODEX_HOME/kjham-cc.config.toml`을 만든다. 두 번째 명령은 CLI에 모델·남은 context·브랜치·현재 디렉터리 상태줄과 프로젝트·상태·대화·진행도 제목을 선택 적용한다. CLI 프로필은 데스크톱 앱의 화면 디자인을 바꾸지 않는다. 앱에서는 새 대화에서 설치된 지침과 스킬을 사용한다.
+
+기존 Codex `config.toml`, `notify`, hooks, 모델·권한·MCP 설정은 수정하지 않는다. Computer Use 등이 쓰는 `notify`를 다른 알림으로 교체하지 않으며 hook 신뢰 승인도 자동 추가하지 않는다. 개인 남은 일은 `$CODEX_HOME/kjham-cc/followups`에 보관해 Claude의 plugin store와 섞이지 않는다. 두 제품 사이에 항목을 자동 복사하거나 동기화하지 않는다.
+
+Codex 기록은 로컬 평문 JSON이다. 비밀키·토큰·개인정보·대화 전문을 넣지 않는다. 파일 자체를 네트워크로 보내는 기능은 없지만 agent가 조회한 출력은 현재 대화에 포함된다. 기존 저장소 작업 기록이 있으면 개인 색인에는 경로와 짧은 다음 행동만 남긴다. 자동 기록 hook이나 별도 모델 호출은 추가하지 않는다.
+
+기존 Claude 배포 경로는 호환성을 위해 유지하고 Codex 전용 파일은 `codex/`에 모았다. 공유 스킬의 원본은 `plugins/slide-craft/skills/` 한 곳이다. 설치 대상은 `--target=claude`, `--target=codex`, `--target=all`로 선택한다. 기본은 `all`이며 Codex 홈이 이미 있는 PC에만 Codex도 설치한다. `--target=codex`는 홈이 없어도 만든다.
+
+공식 설정 근거: [Codex CLI 명령](https://learn.chatgpt.com/docs/developer-commands?surface=cli), [알림](https://learn.chatgpt.com/docs/notifications), [설정](https://learn.chatgpt.com/docs/config-file/config-advanced).
 
 ## 토큰 절감 설정
 
@@ -45,6 +97,8 @@ Claude Code 설정 개인 GitHub 저장소 — mods 마켓플레이스, 전역 �
 
 Claude Code 2.1.287+, Node 18+ (설치 스크립트·상태줄·hook 용), git.
 
+Windows의 Claude 설치 단계는 native `claude.exe`를 사용한다. shell을 거치지 않아 npm의 `claude.cmd`만 있는 환경은 지원하지 않는다. `--target=codex` 설치에는 Claude 실행 파일이 필요 없다. 새 mod는 Claude Code 2.1.325에서 검증했다.
+
 ```bash
 git clone https://github.com/kjham/kjham-cc.git
 cd kjham-cc
@@ -54,7 +108,7 @@ cd kjham-cc
 
 - `settings.json` 은 덮어쓰지 않고 병합하며, 바뀌는 파일은 `.bak-<시각>` 으로 백업한다.
 - `--dev`: 마켓플레이스를 이 클론 폴더로 등록한다. 편집 후 `/reload-plugins` 만으로 반영된다(주 개발 PC 용).
-- `--settings-only`, `--dry-run` 지원.
+- `--settings-only`, `--dry-run`, `--target=all|claude|codex` 지원. Codex 단독 설치는 Claude 설정과 marketplace에 접근하지 않는다.
 - 열려 있는 세션은 `/reload-plugins`, 새 세션은 바로 적용.
 
 ## 업데이트
@@ -84,6 +138,9 @@ cd kjham-cc && git pull
 ```bash
 claude plugin validate plugins/<mod>
 claude plugin test plugins/<mod>
+node --test bootstrap/codex.test.mjs codex/tests/followups.test.mjs
+# Windows PowerShell 문자열 주입 회귀 테스트 — Node 22.6+에서 실행
+node --experimental-strip-types --test plugins/long-turn-notify/tests/powershell-string.test.mjs
 ```
 
 - 타입: 세션이 hot-reload 하는 폴더에서는 엔진이 `.claude-plugin/types/` 를 깔아 준다(커밋 제외).

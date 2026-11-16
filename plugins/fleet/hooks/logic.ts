@@ -63,7 +63,7 @@ export function parseCard(answer: string, at: number): Card | undefined {
     const line = lines.find(l => l.replace(/^[\s>*-]+/, '').startsWith(label))
     if (!line) return undefined
     const value = line.slice(line.indexOf(label) + label.length).replace(/^\s*[:：]\s*/, '').trim()
-    return value && !/^(없음|-|n\/a)$/i.test(value) ? oneLine(value, 120) : undefined
+    return value && !/^(없음|-|n\/a)$/i.test(value) ? value.replace(/\s+/g, ' ') : undefined
   }
   return { status, did: field('한 일'), pending: field('남은 일'), decision: field('결정 필요'), at }
 }

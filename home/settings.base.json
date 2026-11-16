@@ -37,6 +37,9 @@
   "enabledPlugins": {
     "usage-hud@kjham-cc": true,
     "fleet@kjham-cc": true,
+    "session-nickname@kjham-cc": true,
+    "long-turn-notify@kjham-cc": true,
+    "compact-tool-rows@kjham-cc": true,
     "ko-guard@kjham-cc": true,
     "turn-divider@kjham-cc": true,
     "slide-craft@kjham-cc": true,

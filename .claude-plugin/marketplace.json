@@ -5,6 +5,9 @@
   "plugins": [
     { "name": "usage-hud", "source": "./plugins/usage-hud" },
     { "name": "fleet", "source": "./plugins/fleet" },
+    { "name": "session-nickname", "source": "./plugins/session-nickname" },
+    { "name": "long-turn-notify", "source": "./plugins/long-turn-notify" },
+    { "name": "compact-tool-rows", "source": "./plugins/compact-tool-rows" },
     { "name": "ko-guard", "source": "./plugins/ko-guard" },
     { "name": "turn-divider", "source": "./plugins/turn-divider" },
     { "name": "slide-craft", "source": "./plugins/slide-craft" },

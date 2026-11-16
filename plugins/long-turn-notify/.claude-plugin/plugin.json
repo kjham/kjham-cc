@@ -1,0 +1,9 @@
+{
+  "name": "long-turn-notify",
+  "version": "0.1.1",
+  "description": "장시간 작업 완료·입력 대기 알림",
+  "author": {
+    "name": "Koenjoo Ham"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "session-nickname",
+  "version": "0.1.0",
+  "description": "세션 이름 자동 지정",
+  "author": {
+    "name": "Koenjoo Ham"
+  },
+  "license": "MIT"
+}

@@ -1,7 +1,7 @@
 {
   "name": "fleet",
-  "version": "0.1.0",
-  "description": "이 PC의 모든 Claude Code 세션을 모아 입력창 위에 대기·결정·작업·새 결과 수를 보여 주고, 다른 세션이 입력을 기다리면 알린다. /sessions 는 세션별 상세 패널.",
+  "version": "0.2.1",
+  "description": "세션 현황과 진행도를 모아 보고, 결과 카드의 남은 일을 세션 종료 후에도 보관한다. /sessions에서 완료·보류·재개할 수 있다.",
   "author": {
     "name": "Koenjoo Ham",
     "url": "https://github.com/kjham"

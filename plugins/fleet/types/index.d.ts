@@ -10,6 +10,19 @@ export type Card = {
 
 export type RunState = 'working' | 'waiting' | 'idle'
 
+export type Followup = {
+  id: string
+  sessionId: string
+  sessionName: string
+  location: string
+  did?: string
+  pending?: string
+  decision?: string
+  status: 'open' | 'deferred' | 'done'
+  createdAt: number
+  updatedAt: number
+}
+
 /** 한 세션이 $.store 의 `s:<sessionId>` 에 게시하는 상태. */
 export type Rec = {
   sessionId: string
@@ -59,6 +72,7 @@ declare module 'claude-code' {
       rows: Row[]
       /** 경과 시간 표시를 갱신하는 틱 */
       now: number
+      followups: Followup[]
     }
   }
 }
