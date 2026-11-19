@@ -23,6 +23,8 @@ Claude Code·Codex 개인 설정 저장소. Claude Code mods와 hook, Codex 지�
 | `home/hooks/autorun.mjs` | command hook | 무인 진행. "멈추지 말고", "승인 없이", "퇴근" 같은 지시를 받으면 원문을 `~/.claude/autorun/<세션 이름>.md` 에 저장한다(신호가 약하거나 예로 든 글이면 저장 여부를 모델이 판단, "무인 진행 꺼"로 끔). 이 파일이 있는 세션만: compact·resume 직후 지시를 다시 넣고, 멈추려 하면 한 번 되돌린다. 파일에 `status: done` 을 쓰면 꺼진다. 10분 자기 알림 cron 대신 쓴다. mod API 는 멈춤을 막을 수 없어 command hook 으로 둔다 | — |
 | `home/hooks/token-guard.mjs` | command hook | 토큰 절감 알림 3가지. 60분 넘게 쉬었고 context 가 200k 를 넘으면 첫 입력을 한 번 막고 `/compact` 를 권한다(다시 보내면 통과). 30분보다 짧은 반복 cron 은 만들기 전에 확인을 받는다. 새 세션 시작 때 프로젝트 `MEMORY.md` 가 80줄을 넘으면 알린다 | — |
 | `home/agents/Explore.md` | subagent | 내장 `Explore` 를 같은 이름으로 덮어 Haiku 로 돌린다. 읽기 전용 탐색, 한국어 보고 | — |
+| `home/skills/setting-negative-bot/` | 전역 skill | 이 세션을 negative_bot 으로 둔다. 여러 세션의 배포·E2E 순서를 조율하고 배포 전 적대적 리뷰를 한다. 환경표·계정 같은 레포별 정보는 그 레포의 메모리·지침에서 읽는다 | `/setting-negative-bot` |
+| `home/skills/setting-worker/` | 전역 skill | 작업 세션이 negative_bot 에 push·배포·E2E 전 신호를 받고 끝나면 결과를 알리는 규칙 | `/setting-worker` |
 | `tools/usage/` | 측정 스크립트 | `~/.claude/projects` 기록으로 일·모델·세션·context 분포·tool 출력 크기(`analyze_usage.py`)와 턴을 시작한 주체별 비용(`turn_attribution.py`)을 낸다 | `python tools/usage/analyze_usage.py 2026-11-12 2026-11-13` |
 | `home/ccstatusline/` | 상태줄 | 모델·브랜치·변경·**캐시 타이머·적중률**·compaction 횟수 (캐시 값은 mod API 에 없어 상태줄이 맡는다) | — |
 
@@ -128,6 +130,7 @@ cd kjham-cc && git pull
 | 전역 지침(`home/CLAUDE.md`) | ✗ | ✓ `~/.claude/CLAUDE.md` 로 복사 | 새 세션 또는 `/clear` 뒤 |
 | hook 스크립트(`home/hooks/`) | ✗ | ✓ `~/.claude/hooks/` 로 복사 | 바로 |
 | subagent 정의(`home/agents/`) | ✗ | ✓ `~/.claude/agents/` 로 복사 | 새 세션부터 |
+| 전역 skill(`home/skills/`) | ✗ | ✓ `~/.claude/skills/<이름>/SKILL.md` 로 복사 | 새 세션부터 |
 | 측정 스크립트(`tools/`) | ✓ | — | 바로 |
 
 - 같은 내용을 다시 설치해도 안전하다. 바뀐 파일만 백업 후 덮어쓰고 나머지는 `(변경 없음)` 으로 건너뛴다.

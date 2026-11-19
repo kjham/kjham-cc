@@ -84,6 +84,9 @@ write(join(claudeDir, 'output-styles', 'plain-korean.md'), readFileSync(join(rep
 for (const sub of ['hooks', 'agents']) {
   for (const name of readdirSync(join(repo, 'home', sub))) write(join(claudeDir, sub, name), readFileSync(join(repo, 'home', sub, name), 'utf8'))
 }
+for (const name of readdirSync(join(repo, 'home', 'skills'))) {
+  write(join(claudeDir, 'skills', name, 'SKILL.md'), readFileSync(join(repo, 'home', 'skills', name, 'SKILL.md'), 'utf8'))
+}
 const ccsl = join(homedir(), '.config', 'ccstatusline', 'settings.json')
 if (existsSync(ccsl)) console.log(`  = ${ccsl} (이미 있어 그대로 둠 — 바꾸려면 npx ccstatusline@2.2.30 로 편집)`)
 else write(ccsl, readFileSync(join(repo, 'home', 'ccstatusline', 'settings.json'), 'utf8'))
