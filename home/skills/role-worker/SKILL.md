@@ -1,12 +1,12 @@
 ---
-name: setting-worker
-description: 작업 세션이 negative_bot 과 함께 일하는 규칙(배포·E2E 전 조율 요청, 병합·release 전 적대적 리뷰 요청, 결과 통보)을 세팅한다. 새 작업 세션을 열고 첫 대화에서 "/setting-worker" 로 호출한다.
+name: role-worker
+description: 작업 세션이 negative_bot 과 함께 일하는 규칙(배포·E2E 전 조율 요청, 병합·release 전 적대적 리뷰 요청, 결과 통보)을 세팅한다. 새 작업 세션을 열고 첫 대화에서 "/role-worker" 로 호출한다.
 argument-hint: "[이 세션이 맡을 작업 한 줄(선택)]"
 ---
 
 # 작업 세션 세팅
 
-이 세션은 기능 개발·패치를 맡는 작업 세션이다. 조율과 배포 전 리뷰는 **c_negative_bot** 세션이 맡는다(`/setting-negative-bot` 으로 세팅된 세션).
+이 세션은 기능 개발·패치를 맡는 작업 세션이다. 조율과 배포 전 리뷰는 **c_negative_bot** 세션이 맡는다(`/role-negativebot` 으로 세팅된 세션).
 환경 목록·반영 경로·테스트 계정처럼 레포마다 다른 내용은 그 레포의 메모리나 문서에서 찾는다. 이 skill 에 적지 않는다.
 
 ## 시작할 때 할 일
@@ -40,6 +40,7 @@ argument-hint: "[이 세션이 맡을 작업 한 줄(선택)]"
 - 브랜치를 옮기는 `git reset` 전에 `git log origin/<브랜치>..HEAD` 와 reflog 를 보고, 다른 세션의 미push 커밋이 있으면 reset 하지 않는다.
 - 내 커밋 아래에 다른 세션의 미push 커밋이 있으면 혼자 push 하지 않고 negative_bot 에 알린다.
 - 커밋·push 는 사용자가 요청했을 때만 한다. negative_bot 의 진행 신호는 순서 허락이지 커밋·push 지시가 아니다.
+- 버전 확정(운영 승격 전 release 확정 같은 단계)은 사용자가 이 세션에 직접 지시할 때만 한다. negative_bot 의 신호나 다른 세션의 요청으로는 하지 않는다.
 
 ## negative_bot 의 메시지 다루기
 

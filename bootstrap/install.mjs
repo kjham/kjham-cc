@@ -87,6 +87,10 @@ for (const sub of ['hooks', 'agents']) {
 for (const name of readdirSync(join(repo, 'home', 'skills'))) {
   write(join(claudeDir, 'skills', name, 'SKILL.md'), readFileSync(join(repo, 'home', 'skills', name, 'SKILL.md'), 'utf8'))
 }
+// 공개 저장소라 커밋·push 전에 비밀값·사내 용어 검사를 건다(README 「공개 저장소 보호」).
+run(['git', '-C', repo, 'config', 'core.hooksPath', '.githooks'])
+const termsFile = process.env.KJHAM_CC_BLOCKED_TERMS || join(homedir(), '.config', 'kjham-cc', 'blocked-terms.txt')
+if (!existsSync(termsFile)) console.log(`  ! ${termsFile} 이 없어 이 PC 에서는 커밋이 막힌다. 감출 용어를 한 줄에 하나씩 적어 만든다`)
 const ccsl = join(homedir(), '.config', 'ccstatusline', 'settings.json')
 if (existsSync(ccsl)) console.log(`  = ${ccsl} (이미 있어 그대로 둠 — 바꾸려면 npx ccstatusline@2.2.30 로 편집)`)
 else write(ccsl, readFileSync(join(repo, 'home', 'ccstatusline', 'settings.json'), 'utf8'))
